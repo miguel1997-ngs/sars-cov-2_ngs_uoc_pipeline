@@ -8,7 +8,7 @@ fastqc R1.fastq.gz R2.fastq.gz
 
 # Filtramos por tamaño (>= 70 bp) y por calidad (QC >= 20) y comprimos los archivos:
 
-cutadapt -m 70 -q 20 --pair-filter=any R1.fastq.gz R2.fastq.gz -o R1_cutadapt.fastq -p  R2_cutadapt.fastq
+cutadapt -m 100 -q 20 --pair-filter=any R1.fastq.gz R2.fastq.gz -o R1_cutadapt.fastq -p  R2_cutadapt.fastq
 gzip R1_cutadapt.fast R2_cutadapt.fastq
 
 # Comprobamos que el filtraje se ha realizado correctamente, empleando del nuevo el programa FastQC
@@ -30,9 +30,9 @@ samtools sort -o archivo_ordenado.bam archivo.bam
 samtools mpileup -u -v -f reference.fasta -t AD archivo_ordenado.bam | bcftools call --ploidy 1 -mv -Ov -o archivo.vcf
 
 # Seleccionamos las columnas del archivo en formato VCF que nos interesan.
-# Solamente se seleccionarán aquellas posiciones que presenten una profundidad de secuencia (DP) superior a 100 y que hayan aparecido mutadas en al menos el 75% de las lecturas que cubren dichas posiciones
+# Solamente se seleccionarán aquellas posiciones que presenten una profundidad de secuencia (DP) superior a 50 y que hayan aparecido mutadas en al menos el 75% de las lecturas que cubren dichas posiciones
 
-grep -v "##" archivo.vcf | gawk '{print $2,$4,$5,$10}' | tr : "\t"|gawk '{print $1,$2,$3,$6}'|tr , "\t" | gawk '{print $1,$2,$3,$4+$5,$4,$5}'|grep -v "POS" |gawk '{if($5/$4<0.25) $7=$3; if($5/$4>=0.25) $7=$2}''{print $1,$2,$3,$4,$5,$6,$7}'|gawk '{$8=$5"/"$6}''{print $1,$2,$3,$4,$8,$7}'|gawk '{if($6==$3) $7="YES"; if($6!=$3) $7="NO"}''{print $1,$2,$3,$4,$5,$6,$7}'|gawk '{if($4>=100) print $1,$2,$3,$4,$5,$6,$7}'|tr " " "\t" > archivo.txt
+grep -v "##" archivo.vcf | gawk '{print $2,$4,$5,$10}' | tr : "\t"|gawk '{print $1,$2,$3,$6}'|tr , "\t" | gawk '{print $1,$2,$3,$4+$5,$4,$5}'|grep -v "POS" |gawk '{if($5/$4<0.25) $7=$3; if($5/$4>=0.25) $7=$2}''{print $1,$2,$3,$4,$5,$6,$7}'|gawk '{$8=$5"/"$6}''{print $1,$2,$3,$4,$8,$7}'|gawk '{if($6==$3) $7="YES"; if($6!=$3) $7="NO"}''{print $1,$2,$3,$4,$5,$6,$7}'|gawk '{if($4>=50) print $1,$2,$3,$4,$5,$6,$7}'|tr " " "\t" > archivo.txt
 
 echo -e "POS\tREF\tALT\tDP\tAD\tDEF\tVAR" > titulos.txt
 
