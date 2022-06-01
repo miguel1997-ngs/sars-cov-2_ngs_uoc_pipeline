@@ -6,7 +6,7 @@ fastqc R1.fastq.gz R2.fastq.gz
 
 ## Para facilitar la comprensión del código: R1 --> lecturas forward; R2 --> lecturas reverse.
 
-# Filtramos por tamaño (>= 70 bp) y por calidad (QC >= 20) y comprimos los archivos:
+# Filtramos por tamaño (>= 100 bp) y por calidad (QC >= 20) usando el programa Cutadapt y comprimos los archivos:
 
 cutadapt -m 100 -q 20 --pair-filter=any R1.fastq.gz R2.fastq.gz -o R1_cutadapt.fastq -p  R2_cutadapt.fastq
 gzip R1_cutadapt.fast R2_cutadapt.fastq
